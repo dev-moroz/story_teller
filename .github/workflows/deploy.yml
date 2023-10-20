@@ -1,0 +1,30 @@
+name: Deploy to server
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [16.x]
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '16'
+      # Setup key
+      - run: set -eu
+      - run: mkdir "$HOME/.ssh"
+      - run: echo "${{ secrets.KEY }}" > "$HOME/.ssh/key"
+      - run: chmod 600 "$HOME/.ssh/key"
+      # Deploy
+      - run: rsync -e "ssh -i $HOME/.ssh/key -o StrictHostKeyChecking=no" --archive --compress --delete . root@${{ secrets.HOST }}:/var/www/remontrevda.online/story_teller
+
+      # Install npm in a specific directory
+      - name: Install npm
+        run: |
+          ssh -i "$HOME/.ssh/key" -o StrictHostKeyChecking=no root@${{ secrets.HOST }} "cd /var/www/remontrevda.online/story_teller && npm install"

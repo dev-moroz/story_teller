@@ -4,7 +4,6 @@ import { message } from "telegraf/filters";
 import { chatGPT } from './chatgpt.js'
 import { create } from './notion.js'
 import { Loader } from './loader.js'
-
 import 'dotenv/config'
 
 const bot = new Telegraf(process.env.TELEGRAM_TOKEN, {
