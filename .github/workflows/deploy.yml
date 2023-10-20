@@ -25,10 +25,10 @@ jobs:
       - name: Create .env file based on Github Secrets
         uses: ozaytsev86/create-env-file-action@v1
         with:
-          ENV_TELEGRAM_TOKEN: ${{ variables.TELEGRAM_TOKEN }}
-          ENV_OPENAI_API_KEY: ${{ variables.OPENAI_API_KEY }}
-          ENV_NOTION_API_KEY: ${{ variables.NOTION_API_KEY }}
-          ENV_NOTION_PAGE_ID: ${{ variables.NOTION_PAGE_ID }}
+          ENV_TELEGRAM_TOKEN: ${{ env.TELEGRAM_TOKEN }}
+          ENV_OPENAI_API_KEY: ${{ env.OPENAI_API_KEY }}
+          ENV_NOTION_API_KEY: ${{ env.NOTION_API_KEY }}
+          ENV_NOTION_PAGE_ID: ${{ env.NOTION_PAGE_ID }}
       # Deploy
       - run: rsync -e "ssh -i $HOME/.ssh/key -o StrictHostKeyChecking=no" --archive --compress --delete . root@${{ secrets.HOST }}:/var/www/remontrevda.online/story_teller
 
