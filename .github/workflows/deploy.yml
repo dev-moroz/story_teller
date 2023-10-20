@@ -21,6 +21,14 @@ jobs:
       - run: mkdir "$HOME/.ssh"
       - run: echo "${{ secrets.KEY }}" > "$HOME/.ssh/key"
       - run: chmod 600 "$HOME/.ssh/key"
+       #Add .env
+      - name: Create .env file based on Github Secrets
+        uses: ozaytsev86/create-env-file-action@v1
+        with:
+          TELEGRAM_TOKEN: ${{ variables.TELEGRAM_TOKEN }}
+          OPENAI_API_KEY: ${{ variables.OPENAI_API_KEY }}
+          NOTION_API_KEY: ${{ variables.NOTION_API_KEY }}
+          NOTION_PAGE_ID: ${{ variables.NOTION_PAGE_ID }}
       # Deploy
       - run: rsync -e "ssh -i $HOME/.ssh/key -o StrictHostKeyChecking=no" --archive --compress --delete . root@${{ secrets.HOST }}:/var/www/remontrevda.online/story_teller
 
