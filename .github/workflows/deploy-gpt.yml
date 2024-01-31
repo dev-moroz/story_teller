@@ -1,0 +1,38 @@
+name: Deploy to server
+
+on:
+  push:
+    branches:
+      - chat-gpt
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [16.x]
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '16'
+      # Setup key
+      - run: set -eu
+      - run: mkdir "$HOME/.ssh"
+      - run: echo "${{ secrets.KEY }}" > "$HOME/.ssh/key"
+      - run: chmod 600 "$HOME/.ssh/key"
+       #Add .env
+      - name: Create .env file based on Github Secrets
+        uses: ozaytsev86/create-env-file-action@v1
+        with:
+          ENV_TELEGRAM_TOKEN: ${{ vars.TELEGRAM_TOKEN }}
+          ENV_OPENAI_API_KEY: ${{ vars.OPENAI_API_KEY }}
+          ENV_NOTION_API_KEY: ${{ vars.NOTION_API_KEY }}
+          ENV_NOTION_PAGE_ID: ${{ vars.NOTION_PAGE_ID }}
+      # Deploy
+      - run: rsync -e "ssh -i $HOME/.ssh/key -o StrictHostKeyChecking=no" --archive --compress --delete . root@${{ secrets.HOST }}:/var/www/remontrevda.online/chat_gpt
+
+      # Install npm in a specific directory
+      - name: Install npm
+        run: |
+          ssh -i "$HOME/.ssh/key" -o StrictHostKeyChecking=no root@${{ secrets.HOST }} "cd /var/www/remontrevda.online/chat_gpt && npm install"
